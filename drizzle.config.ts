@@ -1,8 +1,13 @@
 // Configuración drizzle-kit para generar migraciones (db:generate) y aplicarlas
 // directamente en Supabase (db:push). Las migraciones se versionan en ./drizzle.
 
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
+
+// Carga .env.local primero (override) y luego .env como fallback,
+// igual que hace Next.js. drizzle-kit no lo hace solo.
+config({ path: '.env.local' });
+config();
 
 export default defineConfig({
   dialect: 'postgresql',
