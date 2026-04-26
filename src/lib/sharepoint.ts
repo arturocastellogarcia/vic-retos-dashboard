@@ -52,12 +52,15 @@ export async function getAccessToken(): Promise<string> {
       scopes: SCOPES,
     });
   } else {
-    // Sin refresh token: device code flow. Solo viable en entornos interactivos.
-    if (!process.stdout.isTTY) {
+    // Sin refresh token: device code flow. Por defecto solo se permite en TTY
+    // (para que cron de Vercel no se quede colgado). SHAREPOINT_INTERACTIVE=1
+    // bypasses ese guard cuando se llama desde un script explícitamente interactivo.
+    const interactive = process.stdout.isTTY || process.env.SHAREPOINT_INTERACTIVE === '1';
+    if (!interactive) {
       throw new Error(
         'SHAREPOINT_REFRESH_TOKEN no configurado y el entorno no es interactivo. ' +
-        'Ejecuta `npm run sync` localmente para obtener el refresh token, o ' +
-        'define SHAREPOINT_ACCESS_TOKEN como escape hatch.'
+        'Ejecuta `npm run sp:auth` localmente para obtener el refresh token, o ' +
+        'define SHAREPOINT_ACCESS_TOKEN como escape hatch.',
       );
     }
     result = await runDeviceCodeFlow();
@@ -87,6 +90,16 @@ async function runDeviceCodeFlow(): Promise<AuthenticationResult | null> {
     deviceCodeCallback: (resp) => {
       console.log(resp.message);
       console.log();
+      // Persistimos el mensaje en disco para que un proceso paralelo
+      // (ej. el agente que orquesta el flow) pueda leerlo sin tener stdout.
+      try {
+        const fs = require('node:fs') as typeof import('node:fs');
+        const os = require('node:os') as typeof import('node:os');
+        const path = require('node:path') as typeof import('node:path');
+        fs.writeFileSync(path.join(os.tmpdir(), 'vic-device-code.txt'), resp.message, 'utf8');
+      } catch {
+        /* ignore */
+      }
     },
   });
 

@@ -304,21 +304,29 @@ export function parseFichaText(rawText: string): ParsedFicha {
     }
   }
 
-  // Separar el bloque "Metadatos" del contenido de Observaciones.
-  // Por convención, "Metadatos" aparece al final, tras 📝 Observaciones.
+  // Separar el bloque "Metadatos" del contenido de Observaciones (caso normal)
+  // o de Estado Actual (caso edge: gestor puso 📝 antes de 📎/🔄, p.ej. spot4dis abril).
   let observacionesText = sections.observaciones || '';
+  let estadoActualText = sections.estadoActual || '';
   let metadatosText = '';
-  const metaMatch = observacionesText.match(/\bMetadatos\b/i);
-  if (metaMatch && metaMatch.index != null) {
-    metadatosText = observacionesText.slice(metaMatch.index + metaMatch[0].length);
-    observacionesText = observacionesText.slice(0, metaMatch.index).trim();
+
+  const obsMatch = observacionesText.match(/\bMetadatos\b/i);
+  if (obsMatch && obsMatch.index != null) {
+    metadatosText = observacionesText.slice(obsMatch.index + obsMatch[0].length);
+    observacionesText = observacionesText.slice(0, obsMatch.index).trim();
   } else {
-    warnings.push('No se encontró bloque "Metadatos"');
+    const estMatch = estadoActualText.match(/\bMetadatos\b/i);
+    if (estMatch && estMatch.index != null) {
+      metadatosText = estadoActualText.slice(estMatch.index + estMatch[0].length);
+      estadoActualText = estadoActualText.slice(0, estMatch.index).trim();
+    } else {
+      warnings.push('No se encontró bloque "Metadatos"');
+    }
   }
 
   // El bloque de seguimiento puede vivir dentro de 🔄 Estado Actual o de 📝 Observaciones (o repartido).
   // Combinamos ambos textos para buscar fecha + 4 subsecciones.
-  const seguimientoSource = `${sections.estadoActual || ''} ${observacionesText}`.trim();
+  const seguimientoSource = `${estadoActualText} ${observacionesText}`.trim();
   const seguimiento = parseSeguimiento(seguimientoSource, warnings);
 
   const kpis = parseKPIs(sections.indicadoresExito || '');
@@ -341,7 +349,7 @@ export function parseFichaText(rawText: string): ParsedFicha {
     contextoUrbano: nullOrTrim(sections.contextoUrbano),
     kpis,
     documentacionAsociada: nullOrTrim(sections.documentacionAsociada),
-    estadoActual: nullOrTrim(sections.estadoActual),
+    estadoActual: nullOrTrim(estadoActualText),
     observaciones: nullOrTrim(observacionesText),
 
     fechaSeguimiento: seguimiento.fechaSeguimiento,

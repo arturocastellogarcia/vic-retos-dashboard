@@ -43,4 +43,6 @@ next-env.d.ts
 # claude code local config
 .claude/
 
-.vercel
+# datos de seed (contenido extraído de SharePoint, sensible)
+.seed-data/
+.fichas-uris.json

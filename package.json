@@ -10,6 +10,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
+    "sp:auth": "tsx scripts/sharepoint-auth.ts",
     "sync": "tsx scripts/sync-sharepoint.ts",
     "test:parser": "tsx scripts/test-parser.ts"
   },
