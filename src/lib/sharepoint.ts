@@ -3,6 +3,9 @@
 // IMPORTANTE: NO requiere Azure AD App Registration en el tenant — el client_id
 // 14d82eec-... es el del módulo "Microsoft Graph PowerShell", público y reutilizable.
 
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { PublicClientApplication, type Configuration, type AuthenticationResult } from '@azure/msal-node';
 import { Client } from '@microsoft/microsoft-graph-client';
 
@@ -93,10 +96,7 @@ async function runDeviceCodeFlow(): Promise<AuthenticationResult | null> {
       // Persistimos el mensaje en disco para que un proceso paralelo
       // (ej. el agente que orquesta el flow) pueda leerlo sin tener stdout.
       try {
-        const fs = require('node:fs') as typeof import('node:fs');
-        const os = require('node:os') as typeof import('node:os');
-        const path = require('node:path') as typeof import('node:path');
-        fs.writeFileSync(path.join(os.tmpdir(), 'vic-device-code.txt'), resp.message, 'utf8');
+        writeFileSync(join(tmpdir(), 'vic-device-code.txt'), resp.message, 'utf8');
       } catch {
         /* ignore */
       }
