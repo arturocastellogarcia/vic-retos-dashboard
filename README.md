@@ -4,6 +4,12 @@ Dashboard de seguimiento de los **16 retos GovTech** del programa **València In
 
 Lee fichas `.docx` mensuales de SharePoint, las parsea, las guarda en Postgres y muestra un cuadro de programa, alertas activas y vista imprimible para la Concejala. Read-only sobre SharePoint: nunca escribe en él.
 
+**🔗 Producción:** https://vic-retos-dashboard.vercel.app
+
+**Estado actual (2026-04-26):** 16 retos, 24 fichas (15 marzo + 9 abril 2026), 13 alertas activas, 678.161 € comprometidos. Auth con magic link para `arturo.castello@lasnaves.com` y `jose.almenar@lasnaves.com` (allowlist hardcoded en `src/lib/auth-allowlist.ts`).
+
+**SharePoint sync automático:** pendiente de consent admin del tenant Las Naves para el client_id público de Microsoft Graph PowerShell. Mientras tanto, el cron es no-op y los syncs se hacen manualmente. Ver [`docs/DEPLOY.md`](docs/DEPLOY.md) sección 7 para activar.
+
 ## Stack
 
 - **Next.js 14** App Router + TypeScript + Tailwind
