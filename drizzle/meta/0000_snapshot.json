@@ -1,0 +1,605 @@
+{
+  "id": "b4a187f4-21cb-46a1-9a94-388c65bfdad6",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.alertas": {
+      "name": "alertas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "reto_id": {
+          "name": "reto_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severidad": {
+          "name": "severidad",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mensaje": {
+          "name": "mensaje",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contexto": {
+          "name": "contexto",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "generada_at": {
+          "name": "generada_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "resuelta_at": {
+          "name": "resuelta_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activa": {
+          "name": "activa",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "alertas_reto_activa_idx": {
+          "name": "alertas_reto_activa_idx",
+          "columns": [
+            {
+              "expression": "reto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "activa",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "alertas_reto_id_retos_id_fk": {
+          "name": "alertas_reto_id_retos_id_fk",
+          "tableFrom": "alertas",
+          "tableTo": "retos",
+          "columnsFrom": [
+            "reto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fichas_mensuales": {
+      "name": "fichas_mensuales",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "reto_id": {
+          "name": "reto_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mes": {
+          "name": "mes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "objetivo": {
+          "name": "objetivo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_lanzamiento": {
+          "name": "fecha_lanzamiento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area_tematica": {
+          "name": "area_tematica",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_reto": {
+          "name": "tipo_reto",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entidades_impulsoras": {
+          "name": "entidades_impulsoras",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entidades_participantes": {
+          "name": "entidades_participantes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contexto_urbano": {
+          "name": "contexto_urbano",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kpis": {
+          "name": "kpis",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "documentacion_asociada": {
+          "name": "documentacion_asociada",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado_actual": {
+          "name": "estado_actual",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observaciones": {
+          "name": "observaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_seguimiento": {
+          "name": "fecha_seguimiento",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_seguimiento_raw": {
+          "name": "fecha_seguimiento_raw",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hitos_alcanzados": {
+          "name": "hitos_alcanzados",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "riesgos_principales": {
+          "name": "riesgos_principales",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issues_abiertos": {
+          "name": "issues_abiertos",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proximos_pasos": {
+          "name": "proximos_pasos",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_programa": {
+          "name": "meta_programa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_owner_tecnico_vic": {
+          "name": "meta_owner_tecnico_vic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_seguimiento_tecnico_vic": {
+          "name": "meta_seguimiento_tecnico_vic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_servicios_municipales": {
+          "name": "meta_servicios_municipales",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_cuenta_analitica": {
+          "name": "meta_cuenta_analitica",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_presupuesto": {
+          "name": "meta_presupuesto",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_presupuesto_raw": {
+          "name": "meta_presupuesto_raw",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_plazo": {
+          "name": "meta_plazo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sharepoint_path": {
+          "name": "sharepoint_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sharepoint_web_url": {
+          "name": "sharepoint_web_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sharepoint_drive_item_id": {
+          "name": "sharepoint_drive_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sharepoint_modified_at": {
+          "name": "sharepoint_modified_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parser_status": {
+          "name": "parser_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parser_warnings": {
+          "name": "parser_warnings",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_text": {
+          "name": "raw_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "fichas_mensuales_reto_mes_uniq": {
+          "name": "fichas_mensuales_reto_mes_uniq",
+          "columns": [
+            {
+              "expression": "reto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "mes",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "fichas_mensuales_reto_mes_idx": {
+          "name": "fichas_mensuales_reto_mes_idx",
+          "columns": [
+            {
+              "expression": "reto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "mes",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "fichas_mensuales_reto_id_retos_id_fk": {
+          "name": "fichas_mensuales_reto_id_retos_id_fk",
+          "tableFrom": "fichas_mensuales",
+          "tableTo": "retos",
+          "columnsFrom": [
+            "reto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.retos": {
+      "name": "retos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "codigo": {
+          "name": "codigo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "area": {
+          "name": "area",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_municipal": {
+          "name": "owner_municipal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_tecnico_vic": {
+          "name": "owner_tecnico_vic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seguimiento_tecnico_vic": {
+          "name": "seguimiento_tecnico_vic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "presupuesto": {
+          "name": "presupuesto",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "empresa_adjudicataria": {
+          "name": "empresa_adjudicataria",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solucion": {
+          "name": "solucion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estado_global": {
+          "name": "estado_global",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ficha_mas_reciente": {
+          "name": "ficha_mas_reciente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ultima_actualizacion": {
+          "name": "ultima_actualizacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sync_runs": {
+      "name": "sync_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fichas_procesadas": {
+          "name": "fichas_procesadas",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "fichas_nuevas": {
+          "name": "fichas_nuevas",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "fichas_actualizadas": {
+          "name": "fichas_actualizadas",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "errores": {
+          "name": "errores",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trigger": {
+          "name": "trigger",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
