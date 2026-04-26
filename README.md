@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# vic-retos-dashboard
 
-## Getting Started
+Dashboard de seguimiento de los **16 retos GovTech** del programa **València Innovation Capital (VIC)**, gestionado por la Fundació Las Naves.
 
-First, run the development server:
+Lee fichas `.docx` mensuales de SharePoint, las parsea, las guarda en Postgres y muestra un cuadro de programa, alertas activas y vista imprimible para la Concejala. Read-only sobre SharePoint: nunca escribe en él.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- **Next.js 14** App Router + TypeScript + Tailwind
+- **Supabase** Postgres (Drizzle ORM) + Auth (magic link)
+- **Microsoft Graph** + `@azure/msal-node` (device code flow, sin Azure App Registration)
+- **mammoth** para extraer texto de los `.docx`
+- **Vercel** deploy + cron diario
+
+## Estructura del repo
+
+```
+src/
+├── app/
+│   ├── (app)/                  # Rutas autenticadas con Header
+│   │   ├── page.tsx            # /  → cuadro de programa
+│   │   ├── retos/[id]/page.tsx # /retos/sirval, etc.
+│   │   ├── alertas/page.tsx    # /alertas
+│   │   └── delegacion/page.tsx # /delegacion (vista imprimible)
+│   ├── api/sync/route.ts       # /api/sync (cron + manual)
+│   ├── auth/callback/route.ts  # OAuth callback
+│   ├── login/page.tsx
+│   ├── no-autorizado/page.tsx
+│   ├── layout.tsx
+│   └── globals.css
+├── components/                 # Header, Semaforo, MetricCard, SyncButton, PrintButton
+├── db/
+│   ├── schema.ts               # Drizzle: 4 tablas (retos, fichas_mensuales, alertas, sync_runs)
+│   └── index.ts                # cliente postgres-js + drizzle()
+├── lib/
+│   ├── parser.ts               # parseFichaText() — tolerante a 5 variantes de fecha
+│   ├── parse-docx.ts           # mammoth + parser
+│   ├── retos-registry.ts       # 16 retos canónicos + filePatterns regex
+│   ├── sharepoint.ts           # listFichas(), downloadFicha(), getAccessToken()
+│   ├── sync.ts                 # syncSharepoint(): orquesta todo el flujo
+│   ├── alerts.ts               # 5 reglas de alerta
+│   ├── ui-helpers.ts           # calcSemaforo, formatEuros, etc.
+│   ├── auth-allowlist.ts       # ALLOWED_EMAILS hardcoded
+│   └── supabase/{client,server}.ts
+└── middleware.ts               # auth + allowlist
+scripts/
+├── sync-sharepoint.ts          # CLI para `npm run sync`
+└── test-parser.ts              # CLI para `npm run test:parser`
+test-fixtures/                  # 4 fichas reales como txt para tests
+docs/
+├── CONTEXTO.md                 # spec original (parsing, schema, reglas)
+├── DEPLOY.md                   # guía de despliegue paso a paso
+└── PARSER.md                   # cómo extender el parser
+drizzle/                        # migraciones generadas por drizzle-kit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Comandos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Dev server local en :3000 |
+| `npm run build` | Build de producción |
+| `npm run lint` | ESLint |
+| `npm run db:push` | Aplica el schema directamente a Supabase (sin migraciones intermedias) |
+| `npm run db:generate` | Genera SQL de migración en `./drizzle/` |
+| `npm run db:studio` | Abre Drizzle Studio (GUI de la DB) |
+| `npm run sync` | Sincronización SharePoint manual (la 1ª vez dispara device code flow) |
+| `npm run test:parser` | Ejercita el parser contra los 4 fixtures (esperado: 3 OK + 1 Partial) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Variables de entorno
 
-## Learn More
+Ver `.env.example`. Las críticas:
 
-To learn more about Next.js, take a look at the following resources:
+- `DATABASE_URL` — string de conexión Postgres (Supabase Pooler en Transaction mode)
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — para Auth
+- `CRON_SECRET` — protege `/api/sync` cuando lo dispara el cron de Vercel
+- `SHAREPOINT_REFRESH_TOKEN` — obtenido vía `npm run sync` localmente; sin él, `/api/sync` es no-op
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Despliegue
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ver [`docs/DEPLOY.md`](docs/DEPLOY.md) para la guía paso a paso (Supabase → GitHub → Vercel → primera sync).
 
-## Deploy on Vercel
+## Extender el parser
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ver [`docs/PARSER.md`](docs/PARSER.md) cuando aparezca una variante nueva en las fichas.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Allowlist
+
+Está hardcoded en `src/lib/auth-allowlist.ts`. Para añadir/quitar un email autorizado: editar el array, commit, redeploy.
